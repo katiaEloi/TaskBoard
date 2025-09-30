@@ -1,0 +1,47 @@
+﻿@page "/"
+
+<h3>📋 TaskBoard</h3>
+
+<input @bind="newTask" placeholder="Nueva tarea..." @onkeydown="OnKeyDown" />
+<button @onclick="AddTask">Añadir</button>
+
+<ul>
+    @foreach (var task in tasks)
+    {
+        <li>
+            <input type="checkbox" checked="@task.Done" @onchange="@(() => Toggle(task))" />
+            <span style="@(task.Done ? "text-decoration: line-through;" : "")">@task.Title</span>
+            <button @onclick="() => DeleteTask(task)">❌</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private string? newTask;
+    private List<TaskItem> tasks = new();
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTask))
+        {
+            tasks.Add(new TaskItem { Title = newTask.Trim() });
+            newTask = string.Empty;
+        }
+    }
+
+    private void Toggle(TaskItem task) => task.Done = !task.Done;
+
+    private void DeleteTask(TaskItem task) => tasks.Remove(task);
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddTask();
+    }
+
+    public class TaskItem
+    {
+        public string Title { get; set; } = string.Empty;
+        public bool Done { get; set; }
+    }
+}
+
